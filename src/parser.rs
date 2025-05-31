@@ -7,7 +7,7 @@ use crate::{
 // #[derive(Debug)]
 pub struct Parser {
     content: String,
-    ini_table: IniTable
+    ini_table: IniTable,
 }
 
 impl Parser {
@@ -30,17 +30,15 @@ impl Parser {
             let mut key = String::new();
             let mut value = String::new();
             // 查看该行是否有selection有那么使用填写的selection，否则使用空字
-        
+
             let err = Box::new(io::Error::new(io::ErrorKind::InvalidData, "无效的数据"));
             if let Some(v) = Self::get_selection(line) {
-                if last_seciton==""{
-                    last_seciton=v.clone();
-                }
-                else {
-                     last_seciton=selection.clone();
+                if last_seciton.is_empty() {
+                    last_seciton = v.clone();
+                } else {
+                    last_seciton = selection.clone();
                 }
                 selection = v;
-            
             }
             if let Some(v) = Self::get_key(line) {
                 key = v
@@ -53,13 +51,15 @@ impl Parser {
             println!("selection:{} {}", selection, last_seciton);
             if selection != last_seciton {
                 selection_map.insert(key.trim().to_string(), Value::from(&value));
-                ini_table.insert(selection.clone(), selection_map);
-                selection_map = HashMap::new();
-            } else {
-                if key!=""{
-                selection_map.insert(key.trim().to_string(), Value::from(&value));
+                println!("selection_map{:#?}", selection_map);
 
-                }
+                ini_table.insert(last_seciton.clone(), selection_map);
+                println!("ini_table{:#?}", ini_table);
+                selection_map = HashMap::new();
+            } else if !key.is_empty() {
+                selection_map.insert(key.trim().to_string(), Value::from(&value));
+                println!("ini_table{:#?}", ini_table);
+                println!("selection_map{:#?}", selection_map);
             }
         }
         ini_table.insert(selection, selection_map);
@@ -77,9 +77,8 @@ impl Parser {
                 }
             }
             selection = line[1..end_idnex].to_string();
-        }
-        else {
-        return None;
+        } else {
+            return None;
         }
         Some(selection)
     }
