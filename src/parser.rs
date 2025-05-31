@@ -27,7 +27,8 @@ impl Parser {
             let mut selection = String::new();
             let mut key = String::new();
             let mut value = String::new();
-            // 查看该行是否有selection有那么使用填写的selection，否则使用空字符
+            // 查看该行是否有selection有那么使用填写的selection，否则使用空字yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
+            符
             let err = Box::new(io::Error::new(io::ErrorKind::InvalidData, "无效的数据"));
             match Self::get_selection(line) {
                 Some(v) => selection = v,
