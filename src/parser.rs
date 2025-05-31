@@ -23,21 +23,24 @@ impl Parser {
         let mut ini_table: IniTable = IniTable::new();
         let mut selection_map: Selection = Selection::new();
         let mut last_seciton = String::new();
+        let mut selection = String::new();
+
         for line in self.content.lines() {
             let line = line;
-            let mut selection = String::new();
             let mut key = String::new();
             let mut value = String::new();
             // 查看该行是否有selection有那么使用填写的selection，否则使用空字
         
             let err = Box::new(io::Error::new(io::ErrorKind::InvalidData, "无效的数据"));
-            match Self::get_selection(line) {
-                Some(v) => {
-                    last_seciton=selection;
-                    selection = v;
-                
-                },
-                None => selection =last_seciton.clone(),
+            if let Some(v) = Self::get_selection(line) {
+                if last_seciton==""{
+                    last_seciton=v.clone();
+                }
+                else {
+                     last_seciton=selection.clone();
+                }
+                selection = v;
+            
             }
             if let Some(v) = Self::get_key(line) {
                 key = v
@@ -50,12 +53,13 @@ impl Parser {
             println!("selection:{} {}", selection, last_seciton);
             if selection != last_seciton {
                 selection_map.insert(key.trim().to_string(), Value::from(&value));
-                ini_table.insert(selection, selection_map);
+                ini_table.insert(selection.clone(), selection_map);
                 selection_map = HashMap::new();
             } else {
                 selection_map.insert(key.trim().to_string(), Value::from(&value));
             }
         }
+        ini_table.insert(selection, selection_map);
         Ok(ini_table)
     }
 
