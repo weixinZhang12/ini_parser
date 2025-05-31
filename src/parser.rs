@@ -31,8 +31,8 @@ impl Parser {
             // 查看该行是否有selection有那么使用填写的selection，否则使用空字符
             let err = Box::new(io::Error::new(io::ErrorKind::InvalidData, "无效的数据"));
             match Self::get_selection(line) {
-                Some(v) => selection = v,
-                None => selection = "".to_string(),
+                Some(v) => {selection = v;last_seciton=selection.clone()},
+                None => selection =last_seciton.clone(),
             }
             if let Some(v) = Self::get_key(line) {
                 key = v
@@ -40,10 +40,9 @@ impl Parser {
             if let Some(v) = Self::get_value(line) {
                 value = v
             }
-            println!("{}",key);
-            println!("{}",value);
-
-
+            println!("key: {}", key);
+            println!("value: {}", value);
+            println!("selection:{} {}", selection, last_seciton);
             if selection != last_seciton {
                 selection_map.insert(key.trim().to_string(), Value::from(&value));
                 ini_table.insert(selection, selection_map);
@@ -65,8 +64,8 @@ impl Parser {
                     return None;
                 }
             }
+            selection = line[1..end_idnex].to_string();
         }
-        selection = line[0..end_idnex].to_string();
         Some(selection)
     }
 
@@ -89,7 +88,7 @@ impl Parser {
             Some(v) => eq_index = v,
             None => return None,
         }
-        value = line[eq_index+1..].to_string();
+        value = line[eq_index + 1..].to_string();
         Some(value)
     }
 }
