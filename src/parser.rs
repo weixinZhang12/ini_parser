@@ -28,13 +28,14 @@ impl Parser {
             let mut selection = String::new();
             let mut key = String::new();
             let mut value = String::new();
-            // 查看该行是否有selection有那么使用填写的selection，否则使用空字yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
-            符
+            // 查看该行是否有selection有那么使用填写的selection，否则使用空字
+        
             let err = Box::new(io::Error::new(io::ErrorKind::InvalidData, "无效的数据"));
             match Self::get_selection(line) {
                 Some(v) => {
+                    last_seciton=selection;
                     selection = v;
-                    last_seciton=selection.clone();
+                
                 },
                 None => selection =last_seciton.clone(),
             }
@@ -69,6 +70,9 @@ impl Parser {
                 }
             }
             selection = line[1..end_idnex].to_string();
+        }
+        else {
+        return None;
         }
         Some(selection)
     }
