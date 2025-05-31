@@ -1,5 +1,5 @@
 use std::error::Error;
-
+#[derive(Debug)]
 pub enum Value {
     Bool(bool),
     String(String),
