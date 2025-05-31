@@ -19,8 +19,7 @@ impl Parser {
         };
         Ok(temp)
     }
-    pub fn parser(&self) -> Result<IniTable, Box<dyn Error>> {
-        let mut ini_table: IniTable = IniTable::new();
+    pub fn parser(&mut self) -> Result<(), Box<dyn Error>> {
         let mut selection_map: Selection = Selection::new();
         let mut last_seciton = String::new();
         let mut selection = String::new();
@@ -46,24 +45,16 @@ impl Parser {
             if let Some(v) = Self::get_value(line) {
                 value = v
             }
-            println!("key: {}", key);
-            println!("value: {}", value);
-            println!("selection:{} {}", selection, last_seciton);
             if selection != last_seciton {
-                selection_map.insert(key.trim().to_string(), Value::from(&value));
-                println!("selection_map{:#?}", selection_map);
-
-                ini_table.insert(last_seciton.clone(), selection_map);
-                println!("ini_table{:#?}", ini_table);
+                self.ini_table.insert(last_seciton.clone(), selection_map);
                 selection_map = HashMap::new();
+                last_seciton=selection.clone();
             } else if !key.is_empty() {
                 selection_map.insert(key.trim().to_string(), Value::from(&value));
-                println!("ini_table{:#?}", ini_table);
-                println!("selection_map{:#?}", selection_map);
             }
         }
-        ini_table.insert(selection, selection_map);
-        Ok(ini_table)
+        self.ini_table.insert(selection, selection_map);
+        Ok(())
     }
 
     fn get_selection(line: &str) -> Option<String> {
@@ -104,5 +95,9 @@ impl Parser {
         }
         value = line[eq_index + 1..].to_string();
         Some(value)
+    }
+    
+    pub fn ini_table(&self) -> &IniTable {
+        &self.ini_table
     }
 }

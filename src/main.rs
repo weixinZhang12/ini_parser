@@ -6,8 +6,9 @@ mod parser;
 mod types;
 
 fn main() {
-    let s =Parser::new("./file/server.ini").unwrap();
-    let r  =s.parser().unwrap();
-    println!("{:#?}",r);    
+    let mut s = Parser::new("./file/server.ini").unwrap();
+    let mut parser = s.parser().unwrap();
+    let r = s.ini_table();
+    println!("{:#?}", r);    
 }
  

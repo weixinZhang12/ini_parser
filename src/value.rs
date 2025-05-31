@@ -13,14 +13,18 @@ impl Value {
             Ok(v) => return v,
             Err(_) => {}
         }
-        match Self::from_int(s) {
-            Ok(v) => return v,
-            Err(_) => {}
+        if s.contains('.') {
+            match Self::from_double(s) {
+                Ok(v) => return v,
+                Err(_) => {}
+            }
+        } else {
+            match Self::from_int(s) {
+                Ok(v) => return v,
+                Err(_) => {}
+            }
         }
-        match Self::from_double(s) {
-            Ok(v) => return v,
-            Err(_) => {}
-        }
+
         Value::String(s.to_string())
     }
 
