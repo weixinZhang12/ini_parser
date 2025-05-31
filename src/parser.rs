@@ -4,7 +4,7 @@ use crate::{
     types::{IniTable, Selection},
     value::Value,
 };
-
+// #[derive(Debug)]
 pub struct Parser {
     content: String,
     ini_table: IniTable,
@@ -19,9 +19,10 @@ impl Parser {
         };
         Ok(temp)
     }
-    pub fn parser(&self) -> Result<(), Box<dyn Error>> {
+    pub fn parser(&self) -> Result<IniTable, Box<dyn Error>> {
         let mut ini_table: IniTable = IniTable::new();
         let mut selection_map: Selection = Selection::new();
+        let mut last_seciton = String::new();
         for line in self.content.lines() {
             let line = line;
             let mut selection = String::new();
@@ -33,18 +34,25 @@ impl Parser {
                 Some(v) => selection = v,
                 None => selection = "".to_string(),
             }
-            match Self::get_key(line) {
-                Some(v) => key = v,
-                None => return Err(err),
+            if let Some(v) = Self::get_key(line) {
+                key = v
             }
-            match Self::get_value(line) {
-                Some(v) => value = v,
-                None => return Err(err),
+            if let Some(v) = Self::get_value(line) {
+                value = v
             }
-            selection_map.insert(key.trim().to_string(), Value::from(&value));
-            ini_table.insert(selection, selection_map);
+            println!("{}",key);
+            println!("{}",value);
+
+
+            if selection != last_seciton {
+                selection_map.insert(key.trim().to_string(), Value::from(&value));
+                ini_table.insert(selection, selection_map);
+                selection_map = HashMap::new();
+            } else {
+                selection_map.insert(key.trim().to_string(), Value::from(&value));
+            }
         }
-        Ok(())
+        Ok(ini_table)
     }
 
     fn get_selection(line: &str) -> Option<String> {
@@ -81,7 +89,7 @@ impl Parser {
             Some(v) => eq_index = v,
             None => return None,
         }
-        value = line[eq_index..].to_string();
+        value = line[eq_index+1..].to_string();
         Some(value)
     }
 }
