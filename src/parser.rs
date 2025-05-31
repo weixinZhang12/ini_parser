@@ -56,7 +56,10 @@ impl Parser {
                 ini_table.insert(selection.clone(), selection_map);
                 selection_map = HashMap::new();
             } else {
+                if key!=""{
                 selection_map.insert(key.trim().to_string(), Value::from(&value));
+
+                }
             }
         }
         ini_table.insert(selection, selection_map);
