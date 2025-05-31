@@ -7,7 +7,7 @@ use crate::{
 // #[derive(Debug)]
 pub struct Parser {
     content: String,
-    ini_table: IniTable,
+    ini_table: IniTable
 }
 
 impl Parser {
@@ -31,7 +31,10 @@ impl Parser {
             // 查看该行是否有selection有那么使用填写的selection，否则使用空字符
             let err = Box::new(io::Error::new(io::ErrorKind::InvalidData, "无效的数据"));
             match Self::get_selection(line) {
-                Some(v) => {selection = v;last_seciton=selection.clone()},
+                Some(v) => {
+                    selection = v;
+                    last_seciton=selection.clone();
+                },
                 None => selection =last_seciton.clone(),
             }
             if let Some(v) = Self::get_key(line) {
