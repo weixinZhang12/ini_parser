@@ -4,10 +4,11 @@ use crate::{
     types::{IniTable, Selection},
     value::Value,
 };
-// #[derive(Debug)]
+#[derive(Debug)]
 pub struct Parser {
     content: String,
     ini_table: IniTable,
+    selection_vec: Vec<String>,
 }
 
 impl Parser {
@@ -16,10 +17,11 @@ impl Parser {
         let temp = Self {
             content: s,
             ini_table: HashMap::new(),
+            selection_vec: vec![],
         };
         Ok(temp)
     }
-    pub fn parser(&mut self) -> Result<(), Box<dyn Error>> {
+    pub fn parser(&mut self) -> Result<IniTable, Box<dyn Error>> {
         let mut selection_map: Selection = Selection::new();
         let mut last_seciton = String::new();
         let mut selection = String::new();
@@ -38,6 +40,10 @@ impl Parser {
                     last_seciton = selection.clone();
                 }
                 selection = v;
+                self.selection_vec.push(selection.clone());
+                self.ini_table.insert(last_seciton.clone(), selection_map);
+                selection_map = HashMap::new();
+                last_seciton = selection.clone();
             }
             if let Some(v) = Self::get_key(line) {
                 key = v
@@ -45,16 +51,12 @@ impl Parser {
             if let Some(v) = Self::get_value(line) {
                 value = v
             }
-            if selection != last_seciton {
-                self.ini_table.insert(last_seciton.clone(), selection_map);
-                selection_map = HashMap::new();
-                last_seciton=selection.clone();
-            } else if !key.is_empty() {
+            if !key.is_empty() {
                 selection_map.insert(key.trim().to_string(), Value::from(&value));
             }
         }
         self.ini_table.insert(selection, selection_map);
-        Ok(())
+        Ok(self.ini_table.clone())
     }
 
     fn get_selection(line: &str) -> Option<String> {
@@ -96,7 +98,7 @@ impl Parser {
         value = line[eq_index + 1..].to_string();
         Some(value)
     }
-    
+
     pub fn ini_table(&self) -> &IniTable {
         &self.ini_table
     }
